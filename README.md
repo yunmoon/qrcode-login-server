@@ -21,7 +21,22 @@ npm run build:live
 ```bash
 npm run start
 ```
+#### 配置文件说明
+配置文件地址 src/configs/config.ts
+```typescript
+export let mongo = {
+    url: 'mongodb://127.0.0.1:27017/qrcode-server' // mongodb连接地址
+};
 
+export let qrcode = {
+    expire: 60000 //单位毫秒,有效时间
+}
+
+export let mqtt = {
+    url: 'mqtt://192.168.0.195:1883' // mqtt连接地址
+}
+
+```
 #### 接口说明
 ##### 1\. 创建应用接口
 ###### 接口功能 
@@ -119,3 +134,53 @@ npm run start
 }
 ```
 ###### 返回参数
+
+
+#### 接口签名说明
+##### 1\.计算步骤
+> 用于计算签名的参数在不同接口之间会有差异，但算法过程固定如下4个步骤。
+
+- 1.将<key, value>请求参数对按key进行字典升序排序，得到有序的参数对列表N
+
+- 2.将列表N中的参数对按URL键值对的格式拼接成字符串，得到字符串T（如：key1=value1&key2=value2），URL键值拼接过程value部分需要URL编码，URL编码算法用大写字母，例如%E8，而不是小写%e8
+
+- 3.将应用密钥以app_key为键名，组成URL键值拼接到字符串T末尾，得到字符串S（如：key1=value1&key2=value2&app_key=密钥)
+
+- 4.对字符串S进行MD5运算，将得到的MD5值所有字符转换成大写，得到接口请求签名
+
+##### 2\.注意事项
+- 1.不同接口要求的参数对不一样，计算签名使用的参数对也不一样
+- 2.参数名区分大小写，参数值为空不参与签名
+- 3.URL键值拼接过程value部分需要URL编码
+- 4.签名有效期5分钟，需要请求接口时刻实时计算签名信息
+
+##### 3\.参考代码（php）
+```php
+// getReqSign ：根据 接口请求参数 和 应用密钥 计算 请求签名
+// 参数说明
+//   - $params：接口请求参数（特别注意：不同的接口，参数对一般不一样，请以具体接口要求为准）
+//   - $appkey：应用密钥
+// 返回数据
+//   - 签名结果
+function getReqSign($params /* 关联数组 */, $appkey /* 字符串*/)
+{
+    // 1. 字典升序排序
+    ksort($params);
+
+    // 2. 拼按URL键值对
+    $str = '';
+    foreach ($params as $key => $value)
+    {
+        if ($value !== '')
+        {
+            $str .= $key . '=' . urlencode($value) . '&';
+        }
+    }
+
+    // 3. 拼接app_key
+    $str .= 'app_key=' . $appkey;
+
+    // 4. MD5运算，得到请求签名
+    return md5($str);
+}
+```
