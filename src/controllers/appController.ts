@@ -18,6 +18,11 @@ router.post('/app/create', [
             throw new Error('description 不能为空')
         }
         return true
+    }),check('appDownloadUrl').custom(value => {
+        if (!value) {
+            throw new Error('appDownloadUrl 不能为空')
+        }
+        return true
     })
 ], (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -28,6 +33,7 @@ router.post('/app/create', [
                 App.create({
                     appName: body.appName,
                     description: body.description,
+                    appDownloadUrl: body.appDownloadUrl
                 },cb)
             },
             (app: AppModel, cb: any) => {

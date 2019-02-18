@@ -1,5 +1,5 @@
 export let mongo = {
-    url: 'mongodb://127.0.0.1:27017/qrcode-server'
+    url: 'mongodb://127.0.0.1:27017/qrcode-server' // mongodb连接地址
 };
 
 export let qrcode = {
@@ -7,5 +7,5 @@ export let qrcode = {
 }
 
 export let mqtt = {
-    url: 'mqtt://192.168.0.195:1883'
+    url: 'mqtt://192.168.0.195:1883' // mqtt连接地址
 }
