@@ -5,3 +5,7 @@ export let mongo = {
 export let qrcode = {
     expire: 60000 //单位毫秒,有效时间
 }
+
+export let mqtt = {
+    url: 'mqtt://192.168.0.195:1883'
+}
